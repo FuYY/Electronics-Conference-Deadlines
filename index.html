@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>微电子领域学术会议截止日期</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2c3e50;
+            --accent-color: #e74c3c;
+            --light-bg: #f5f7fa;
+            --dark-text: #2c3e50;
+            --light-text: #ecf0f1;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--light-bg);
+            color: var(--dark-text);
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: var(--secondary-color);
+            color: var(--light-text);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+        
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .search-filter {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        input, select, button {
+            padding: 8px 15px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+        }
+        
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #2980b9;
+        }
+        
+        .view-toggle button {
+            background-color: #95a5a6;
+        }
+        
+        .view-toggle button.active {
+            background-color: var(--primary-color);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+            background-color: white;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--box-shadow);
+        }
+        
+        th, td {
+            text-align: left;
+            padding: 12px 15px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        th {
+            background-color: var(--secondary-color);
+            color: var(--light-text);
+            cursor: pointer;
+        }
+        
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .countdown {
+            font-weight: bold;
+        }
+        
+        .urgent {
+            color: var(--accent-color);
+        }
+        
+        .approaching {
+            color: orange;
+        }
+        
+        .comfortable {
+            color: green;
+        }
+        
+        .card-view {
+            display: none;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .conference-card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--box-shadow);
+            transition: transform 0.3s;
+        }
+        
+        .conference-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card-header {
+            background-color: var(--secondary-color);
+            color: var(--light-text);
+            padding: 15px;
+            position: relative;
+        }
+        
+        .card-header h3 {
+            margin-bottom: 5px;
+        }
+        
+        .card-body {
+            padding: 15px;
+        }
+        
+        .card-body p {
+            margin-bottom: 10px;
+        }
+        
+        .card-footer {
+            background-color: #f5f5f5;
+            padding: 15px;
+            text-align: right;
+        }
+        
+        .card-footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+        
+        .card-footer a:hover {
+            text-decoration: underline;
+        }
+        
+        @media (max-width: 768px) {
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            th, td {
+                padding: 8px 10px;
+                font-size: 0.9rem;
+            }
+            
+            th {
+                position: sticky;
+                top: 0;
+            }
+            
+            .responsive-table {
+                overflow-x: auto;
+            }
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            background-color: var(--secondary-color);
+            color: var(--light-text);
+            border-radius: var(--border-radius);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>微电子领域学术会议截止日期</h1>
+        <p>帮助您追踪重要微电子学术会议的投稿截止日期</p>
+    </header>
+    
+    <div class="controls">
+        <div class="search-filter">
+            <input type="text" id="searchInput" placeholder="搜索会议名称或地点...">
+            <select id="categoryFilter">
+                <option value="">所有类别</option>
+                <option value="集成电路">集成电路</option>
+                <option value="半导体器件">半导体器件</option>
+                <option value="微电子系统">微电子系统</option>
+                <option value="光电子">光电子</option>
+                <option value="电路设计">电路设计</option>
+            </select>
+            <button id="resetFilters">重置筛选</button>
+        </div>
+        
+        <div class="view-toggle">
+            <button id="tableViewBtn" class="active">表格视图</button>
+            <button id="cardViewBtn">卡片视图</button>
+        </div>
+    </div>
+    
+    <div id="tableView" class="responsive-table">
+        <table id="conferencesTable">
+            <thead>
+                <tr>
+                    <th onclick="sortTable(0)">会议名称 ▼</th>
+                    <th onclick="sortTable(1)">地点</th>
+                    <th onclick="sortTable(2)">类别</th>
+                    <th onclick="sortTable(3)">投稿截止日期</th>
+                    <th onclick="sortTable(4)">倒计时</th>
+                    <th onclick="sortTable(5)">会议日期</th>
+                    <th onclick="sortTable(6)">等级/影响力</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- 会议数据将通过 JavaScript 动态填充 -->
+            </tbody>
+        </table>
+    </div>
+    
+    <div id="cardView" class="card-view">
+        <!-- 会议卡片将通过 JavaScript 动态填充 -->
+    </div>
+    
+    <footer>
+        <p>最后更新时间: <span id="lastUpdated"></span></p>
+        <p>数据来源仅供参考，请以官方网站公布信息为准</p>
+    </footer>
+
+    <script>
+        // 模拟会议数据 (实际应用中可通过API获取或管理员更新)
+        const conferences = [
+            {
+                name: "ISSCC - IEEE International Solid-State Circuits Conference",
+                location: "San Francisco, USA",
+                category: "集成电路",
+                deadline: "2025-09-10",
+                conferenceDate: "2026-02-15 - 2026-02-19",
+                tier: "A+",
+                website: "https://isscc.org"
+            },
+            {
+                name: "IEDM - IEEE International Electron Devices Meeting",
+                location: "San Francisco, USA",
+                category: "半导体器件",
+                deadline: "2025-07-15",
+                conferenceDate: "2025-12-07 - 2025-12-11",
+                tier: "A+",
+                website: "https://ieee-iedm.org"
+            },
+            {
+                name: "VLSI Symposium on Technology & Circuits",
+                location: "Kyoto, Japan",
+                category: "集成电路",
+                deadline: "2025-01-25",
+                conferenceDate: "2025-06-15 - 2025-06-19",
+                tier: "A",
+                website: "https://vlsisymposium.org"
+            },
+            {
+                name: "ESSCIRC - European Solid-State Circuits Conference",
+                location: "Milan, Italy",
+                category: "集成电路",
+                deadline: "2025-04-05",
+                conferenceDate: "2025-09-08 - 2025-09-12",
+                tier: "A",
+                website: "https://esscirc-essderc2025.org"
+            },
+            {
+                name: "ASSCC - IEEE Asian Solid-State Circuits Conference",
+                location: "Singapore",
+                category: "集成电路",
+                deadline: "2025-05-20",
+                conferenceDate: "2025-11-10 - 2025-11-14",
+                tier: "B+",
+                website: "https://www.asscc.org"
+            },
+            {
+                name: "CICC - IEEE Custom Integrated Circuits Conference",
+                location: "Boston, USA",
+                category: "集成电路",
+                deadline: "2025-04-25",
+                conferenceDate: "2025-10-06 - 2025-10-09",
+                tier: "B+",
+                website: "https://www.ieee-cicc.org"
+            },
+            {
+                name: "ICCAD - International Conference on Computer-Aided Design",
+                location: "San Diego, USA",
+                category: "电路设计",
+                deadline: "2025-05-30",
+                conferenceDate: "2025-11-03 - 2025-11-07",
+                tier: "A",
+                website: "https://iccad.com"
+            },
+            {
+                name: "ISCAS - IEEE International Symposium on Circuits and Systems",
+                location: "Bangkok, Thailand",
+                category: "电路设计",
+                deadline: "2025-10-30",
+                conferenceDate: "2026-05-24 - 2026-05-27",
+                tier: "B",
+                website: "https://iscas2026.org"
+            },
+            {
+                name: "IRPS - IEEE International Reliability Physics Symposium",
+                location: "Dallas, USA",
+                category: "半导体器件",
+                deadline: "2025-02-15",
+                conferenceDate: "2025-05-26 - 2025-05-30",
+                tier: "B+",
+                website: "https://irps.org"
+            },
+            {
+                name: "ASP-DAC - Asia and South Pacific Design Automation Conference",
+                location: "Tokyo, Japan",
+                category: "电路设计",
+                deadline: "2025-07-15",
+                conferenceDate: "2026-01-19 - 2026-01-22",
+                tier: "B",
+                website: "https://aspdac.com"
+            }
+        ];
+
+        // 初始化页面
+        document.addEventListener('DOMContentLoaded', function() {
+            // 更新最后更新时间
+            const now = new Date();
+            document.getElementById('lastUpdated').textContent = now.toLocaleString();
+            
+            // 初始化表格和卡片视图
+            updateTableView();
+            updateCardView();
+            
+            // 切换视图事件监听器
+            document.getElementById('tableViewBtn').addEventListener('click', function() {
+                document.getElementById('tableView').style.display = 'block';
+                document.getElementById('cardView').style.display = 'none';
+                this.classList.add('active');
+                document.getElementById('cardViewBtn').classList.remove('active');
+            });
+            
+            document.getElementById('cardViewBtn').addEventListener('click', function() {
+                document.getElementById('tableView').style.display = 'none';
+                document.getElementById('cardView').style.display = 'grid';
+                this.classList.add('active');
+                document.getElementById('tableViewBtn').classList.remove('active');
+            });
+            
+            // 搜索和筛选事件监听器
+            document.getElementById('searchInput').addEventListener('input', updateViews);
+            document.getElementById('categoryFilter').addEventListener('change', updateViews);
+            document.getElementById('resetFilters').addEventListener('click', resetFilters);
+        });
+        
+        // 更新表格视图
+        function updateTableView() {
+            const tableBody = document.querySelector('#conferencesTable tbody');
+            tableBody.innerHTML = '';
+            
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const categoryFilter = document.getElementById('categoryFilter').value;
+            
+            const filteredConferences = conferences.filter(conference => {
+                const matchesSearch = conference.name.toLowerCase().includes(searchTerm) || 
+                                    conference.location.toLowerCase().includes(searchTerm);
+                const matchesCategory = categoryFilter === '' || conference.category === categoryFilter;
+                return matchesSearch && matchesCategory;
+            });
+            
+            filteredConferences.forEach(conference => {
+                const row = document.createElement('tr');
+                
+                const daysLeft = calculateDaysLeft(conference.deadline);
+                let countdownClass = '';
+                if (daysLeft < 0) {
+                    countdownClass = 'passed';
+                } else if (daysLeft <= 7) {
+                    countdownClass = 'urgent';
+                } else if (daysLeft <= 30) {
+                    countdownClass = 'approaching';
+                } else {
+                    countdownClass = 'comfortable';
+                }
+                
+                row.innerHTML = `
+                    <td><a href="${conference.website}" target="_blank">${conference.name}</a></td>
+                    <td>${conference.location}</td>
+                    <td>${conference.category}</td>
+                    <td>${formatDate(conference.deadline)}</td>
+                    <td class="countdown ${countdownClass}">${formatCountdown(daysLeft)}</td>
+                    <td>${conference.conferenceDate}</td>
+                    <td>${conference.tier}</td>
+                `;
+                
+                tableBody.appendChild(row);
+            });
+        }
+        
+        // 更新卡片视图
+        function updateCardView() {
+            const cardContainer = document.getElementById('cardView');
+            cardContainer.innerHTML = '';
+            
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const categoryFilter = document.getElementById('categoryFilter').value;
+            
+            const filteredConferences = conferences.filter(conference => {
+                const matchesSearch = conference.name.toLowerCase().includes(searchTerm) || 
+                                    conference.location.toLowerCase().includes(searchTerm);
+                const matchesCategory = categoryFilter === '' || conference.category === categoryFilter;
+                return matchesSearch && matchesCategory;
+            });
+            
+            filteredConferences.forEach(conference => {
+                const daysLeft = calculateDaysLeft(conference.deadline);
+                let countdownClass = '';
+                if (daysLeft < 0) {
+                    countdownClass = 'passed';
+                } else if (daysLeft <= 7) {
+                    countdownClass = 'urgent';
+                } else if (daysLeft <= 30) {
+                    countdownClass = 'approaching';
+                } else {
+                    countdownClass = 'comfortable';
+                }
+                
+                const card = document.createElement('div');
+                card.className = 'conference-card';
+                card.innerHTML = `
+                    <div class="card-header">
+                        <h3>${conference.name}</h3>
+                        <p>${conference.location}</p>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>类别:</strong> ${conference.category}</p>
+                        <p><strong>截止日期:</strong> ${formatDate(conference.deadline)}</p>
+                        <p><strong>倒计时:</strong> <span class="${countdownClass}">${formatCountdown(daysLeft)}</span></p>
+                        <p><strong>会议日期:</strong> ${conference.conferenceDate}</p>
+                        <p><strong>等级/影响力:</strong> ${conference.tier}</p>
+                    </div>
+                    <div class="card-footer">
+                        <a href="${conference.website}" target="_blank">访问官网</a>
+                    </div>
+                `;
+                
+                cardContainer.appendChild(card);
+            });
+        }
+        
+        // 更新两种视图
+        function updateViews() {
+            updateTableView();
+            updateCardView();
+        }
+        
+        // 重置筛选条件
+        function resetFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('categoryFilter').value = '';
+            updateViews();
+        }
+        
+        // 计算截止日期倒计时天数
+        function calculateDaysLeft(deadline) {
+            const today = new Date();
+            const deadlineDate = new Date(deadline);
+            const timeDiff = deadlineDate - today;
+            return Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+        }
+        
+        // 格式化日期
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('zh-CN');
+        }
+        
+        // 格式化倒计时
+        function formatCountdown(daysLeft) {
+            if (daysLeft < 0) {
+                return "已截止";
+            } else if (daysLeft === 0) {
+                return "今天截止!";
+            } else {
+                return `还剩 ${daysLeft} 天`;
+            }
+        }
+        
+        // 表格排序
+        function sortTable(columnIndex) {
+            const table = document.getElementById('conferencesTable');
+            const rows = Array.from(table.rows).slice(1); // 跳过表头
+            const header = table.rows[0].cells[columnIndex];
+            
+            const isAscending = header.textContent.includes('▼');
+            
+            // 重置所有表头的排序标记
+            Array.from(table.rows[0].cells).forEach(cell => {
+                cell.textContent = cell.textContent.replace(/[▼▲]/g, '');
+            });
+            
+            // 设置当前排序列的标记
+            header.textContent += isAscending ? ' ▲' : ' ▼';
+            
+            // 排序行
+            rows.sort((a, b) => {
+                let valueA = a.cells[columnIndex].textContent;
+                let valueB = b.cells[columnIndex].textContent;
+                
+                // 日期特殊处理
+                if (columnIndex === 3 || columnIndex === 5) {
+                    valueA = new Date(valueA);
+                    valueB = new Date(valueB);
+                }
+                
+                // 倒计时特殊处理
+                if (columnIndex === 4) {
+                    valueA = valueA.includes('已截止') ? -1 : parseInt(valueA.match(/\d+/) || [0])[0];
+                    valueB = valueB.includes('已截止') ? -1 : parseInt(valueB.match(/\d+/) || [0])[0];
+                }
+                
+                if (valueA < valueB) return isAscending ? -1 : 1;
+                if (valueA > valueB) return isAscending ? 1 : -1;
+                return 0;
+            });
+            
+            // 重新插入排序后的行
+            const tbody = table.querySelector('tbody');
+            tbody.innerHTML = '';
+            rows.forEach(row => tbody.appendChild(row));
+        }
+    </script>
+</body>
+</html>
