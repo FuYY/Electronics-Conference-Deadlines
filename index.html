@@ -372,6 +372,9 @@
         <div class="admin-buttons">
             <button id="adminLoginBtn">管理员登录</button>
             <button id="suggestChangeBtn">建议修改</button>
+            <button id="exportDataBtn" class="success" style="display: none;">导出数据</button>
+            <input type="file" id="importDataInput" style="display: none;" accept=".json">
+            <button id="importDataBtn" class="warning" style="display: none;">导入数据</button>
         </div>
     </header>
     
@@ -571,8 +574,8 @@
     </footer>
 
     <script>
-        // 模拟会议数据 (实际应用中可通过API获取或管理员更新)
-        let conferences = [
+        // 默认会议数据
+        const defaultConferences = [
             {
                 id: 1,
                 name: "ISSCC - IEEE International Solid-State Circuits Conference",
@@ -595,79 +598,9 @@
             },
             {
                 id: 3,
-                name: "VLSI Symposium on Technology & Circuits",
-                location: "Kyoto, Japan",
-                category: "集成电路",
-                deadline: "2025-01-25",
-                conferenceDate: "2025-06-15 - 2025-06-19",
-                tier: "A",
-                website: "https://vlsisymposium.org"
-            },
-            {
-                id: 4,
-                name: "ESSCIRC - European Solid-State Circuits Conference",
-                location: "Milan, Italy",
-                category: "集成电路",
-                deadline: "2025-04-05",
-                conferenceDate: "2025-09-08 - 2025-09-12",
-                tier: "A",
-                website: "https://esscirc-essderc2025.org"
-            },
-            {
-                id: 5,
-                name: "ASSCC - IEEE Asian Solid-State Circuits Conference",
-                location: "Singapore",
-                category: "集成电路",
-                deadline: "2025-05-20",
-                conferenceDate: "2025-11-10 - 2025-11-14",
-                tier: "B+",
-                website: "https://www.asscc.org"
-            },
-            {
-                id: 6,
-                name: "CICC - IEEE Custom Integrated Circuits Conference",
-                location: "Boston, USA",
-                category: "集成电路",
-                deadline: "2025-04-25",
-                conferenceDate: "2025-10-06 - 2025-10-09",
-                tier: "B+",
-                website: "https://www.ieee-cicc.org"
-            },
-            {
-                id: 7,
-                name: "ICCAD - International Conference on Computer-Aided Design",
-                location: "San Diego, USA",
-                category: "电路设计",
-                deadline: "2025-05-30",
-                conferenceDate: "2025-11-03 - 2025-11-07",
-                tier: "A",
-                website: "https://iccad.com"
-            },
-            {
-                id: 8,
-                name: "ISCAS - IEEE International Symposium on Circuits and Systems",
-                location: "Bangkok, Thailand",
-                category: "电路设计",
-                deadline: "2025-10-30",
-                conferenceDate: "2026-05-24 - 2026-05-27",
-                tier: "B",
-                website: "https://iscas2026.org"
-            },
-            {
-                id: 9,
-                name: "IRPS - IEEE International Reliability Physics Symposium",
-                location: "Dallas, USA",
-                category: "半导体器件",
-                deadline: "2025-02-15",
-                conferenceDate: "2025-05-26 - 2025-05-30",
-                tier: "B+",
-                website: "https://irps.org"
-            },
-            {
-                id: 10,
                 name: "ASP-DAC - Asia and South Pacific Design Automation Conference",
                 location: "Tokyo, Japan",
-                category: "电路设计",
+                category: "集成电路",
                 deadline: "2025-07-15",
                 conferenceDate: "2026-01-19 - 2026-01-22",
                 tier: "B",
@@ -675,15 +608,48 @@
             }
         ];
 
-        // 设置管理员密码 (实际应用中应存储在服务器端)
+        // 管理员凭据（使用SHA-256哈希存储密码）
         const adminCredentials = {
             username: "admin",
-            password: "admin123"
+            // admin123的SHA-256哈希值
+            passwordHash: "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9"
         };
 
+        // 从localStorage加载会议数据
+        let storedConferences = localStorage.getItem('conferences');
+        let conferences = storedConferences ? JSON.parse(storedConferences) : defaultConferences;
+        
         // 管理员状态
         let isAdmin = false;
         let selectedConferenceId = null;
+
+        // 保存会议数据到localStorage
+        function saveConferences() {
+            localStorage.setItem('conferences', JSON.stringify(conferences));
+        }
+
+        // 导出会议数据为JSON文件
+        function exportData() {
+            const dataStr = JSON.stringify(conferences, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'conferences.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // 用于生成SHA-256哈希的函数
+        async function sha256(message) {
+            const msgBuffer = new TextEncoder().encode(message);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+            return hashHex;
+        }
 
         // DOM元素
         const tableView = document.getElementById('tableView');
@@ -725,9 +691,29 @@
                 isAdmin = true;
                 adminLoginBtn.textContent = '退出管理员';
                 addConferenceButton.style.display = 'block';
+                exportDataBtn.style.display = 'block';
+                importDataBtn.style.display = 'block';
                 actionsHeader.style.display = '';
                 updateTableView();
                 updateCardView();
+            }
+        }
+
+        // 导入数据
+        async function importData(file) {
+            try {
+                const text = await file.text();
+                const importedData = JSON.parse(text);
+                if (Array.isArray(importedData)) {
+                    conferences = importedData;
+                    saveConferences();
+                    updateUI();
+                    showNotification('数据导入成功！', false);
+                } else {
+                    throw new Error('无效的数据格式');
+                }
+            } catch (error) {
+                showNotification('导入失败：' + error.message, true);
             }
         }
 
@@ -761,6 +747,18 @@
             document.getElementById('conferenceForm').addEventListener('submit', function(e) {
                 e.preventDefault();
                 handleSaveConference();
+            });
+
+            // 数据导出导入
+            document.getElementById('exportDataBtn').addEventListener('click', exportData);
+            document.getElementById('importDataBtn').addEventListener('click', function() {
+                document.getElementById('importDataInput').click();
+            });
+            document.getElementById('importDataInput').addEventListener('change', function(e) {
+                if (e.target.files.length > 0) {
+                    importData(e.target.files[0]);
+                    e.target.value = '';
+                }
             });
             
             // 建议提交
@@ -855,4 +853,54 @@
             const tableBody = document.querySelector('#conferencesTable tbody');
             tableBody.innerHTML = '';
             
-            const searchTerm = document.getElementByI
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const selectedCategory = document.getElementById('categoryFilter').value;
+            
+            // 过滤会议数据
+            const filteredConferences = conferences.filter(conference => {
+                const matchesSearch = conference.name.toLowerCase().includes(searchTerm) ||
+                                     conference.location.toLowerCase().includes(searchTerm);
+                const matchesCategory = !selectedCategory || conference.category === selectedCategory;
+                return matchesSearch && matchesCategory;
+            });
+            
+            // 更新表格内容
+            filteredConferences.forEach(conference => {
+                const row = document.createElement('tr');
+                const deadline = new Date(conference.deadline);
+                const today = new Date();
+                const daysUntilDeadline = Math.ceil((deadline - today) / (1000 * 60 * 60 * 24));
+                
+                // 格式化日期显示
+                const formattedDeadline = deadline.toLocaleDateString('zh-CN');
+                
+                row.innerHTML = `
+                    <td><a href="${conference.website}" target="_blank">${conference.name}</a></td>
+                    <td>${conference.location}</td>
+                    <td>${conference.category}</td>
+                    <td>${formattedDeadline}</td>
+                    <td>${daysUntilDeadline > 0 ? daysUntilDeadline + ' 天' : '已截止'}</td>
+                    <td>${conference.conferenceDate}</td>
+                    <td>${conference.tier}</td>
+                    ${isAdmin ? `
+                        <td>
+                            <button onclick="editConference(${conference.id})" class="edit-btn">编辑</button>
+                            <button onclick="showDeleteConfirmation(${conference.id})" class="delete-btn">删除</button>
+                        </td>
+                    ` : ''}
+                `;
+                
+                // 根据截止日期添加状态样式
+                if (daysUntilDeadline < 0) {
+                    row.classList.add('passed');
+                } else if (daysUntilDeadline <= 7) {
+                    row.classList.add('urgent');
+                } else if (daysUntilDeadline <= 30) {
+                    row.classList.add('approaching');
+                } else {
+                    row.classList.add('comfortable');
+                }
+                
+                tableBody.appendChild(row);
+            });
+        }
