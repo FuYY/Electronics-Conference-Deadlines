@@ -417,6 +417,8 @@
 
         // 初始化页面
         document.addEventListener('DOMContentLoaded', function() {
+            // 添加默认排序
+            sortTable(3, true);
             // 更新最后更新时间
             const now = new Date();
             document.getElementById('lastUpdated').textContent = now.toLocaleString();
@@ -580,12 +582,13 @@
         }
         
         // 表格排序
-        function sortTable(columnIndex) {
+        // 修改排序函数支持初始排序
+        function sortTable(columnIndex, initialSort = false) {
             const table = document.getElementById('conferencesTable');
             const rows = Array.from(table.rows).slice(1); // 跳过表头
             const header = table.rows[0].cells[columnIndex];
             
-            const isAscending = header.textContent.includes('▼');
+            const isAscending = initialSort ? true : header.textContent.includes('▼');
             
             // 重置所有表头的排序标记
             Array.from(table.rows[0].cells).forEach(cell => {
@@ -621,6 +624,12 @@
             const tbody = table.querySelector('tbody');
             tbody.innerHTML = '';
             rows.forEach(row => tbody.appendChild(row));
+            // 添加会议数据排序
+            conferences.sort((a, b) => {
+                const dateA = new Date(a.deadline);
+                const dateB = new Date(b.deadline);
+                return isAscending ? dateA - dateB : dateB - dateA;
+            });
         }
     </script>
 </body>
