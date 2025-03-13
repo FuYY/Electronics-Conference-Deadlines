@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>微电子领域学术会议截止日期</title>
-    <style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
         :root {
             --primary-color: #3498db;
             --secondary-color: #2c3e50;
@@ -181,7 +182,21 @@
             text-decoration: underline;
         }
         
-        @media (max-width: 768px) {
+        .github-corner {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    font-size: 1.8rem;
+    color: var(--light-text);
+    transition: all 0.3s ease;
+}
+
+.github-corner:hover {
+    color: var(--primary-color);
+    transform: rotate(-10deg) scale(1.1);
+}
+
+@media (max-width: 768px) {
             .controls {
                 flex-direction: column;
                 align-items: stretch;
@@ -216,6 +231,9 @@
     <header>
         <h1>微电子领域学术会议截止日期</h1>
         <p>帮助您追踪重要微电子学术会议的投稿截止日期</p>
+    <a href="https://github.com/FuYY/Electronics-Conference-Deadlines" class="github-corner" target="_blank">
+        <i class="fab fa-github"></i>
+    </a>
     </header>
     
     <div class="controls">
