@@ -68,6 +68,12 @@
       vertical-align: top;
     }
 
+    th:nth-child(7),
+    td:nth-child(7) {
+      min-width: 130px;
+      white-space: nowrap;
+    }
+
     th {
       background: #f0f4fa;
       font-weight: 600;
@@ -96,6 +102,10 @@
     .deadline-upcoming {
       color: var(--ok);
       font-weight: 600;
+    }
+
+    .rank-emphasis {
+      font-weight: 700;
     }
 
     footer {
@@ -353,6 +363,17 @@
       return { text: days + " 天 " + hours + " 小时", expired: false };
     }
 
+    function formatRank(rankText) {
+      if (rankText === "CCF A" || rankText === "CCF B") {
+        const level = rankText.slice(-1);
+        return 'CCF <span class="rank-emphasis">' + level + "</span>";
+      }
+      if (rankText.includes("顶会")) {
+        return rankText.replace("顶会", '<span class="rank-emphasis">顶会</span>');
+      }
+      return rankText;
+    }
+
     function renderTable() {
       const tbody = document.getElementById("conference-body");
       const sorted = conferences.slice().sort((a, b) => {
@@ -383,7 +404,7 @@
           "<td>" + formatDate(conf.submissionDeadline) + "</td>" +
           '<td class="' + (countdown.expired ? "deadline-expired" : "deadline-upcoming") + '">' + countdown.text + "</td>" +
           "<td>" + conf.conferenceDate + "</td>" +
-          "<td>" + conf.rank + "</td>";
+          "<td>" + formatRank(conf.rank) + "</td>";
         tbody.appendChild(tr);
       });
     }
