@@ -1,906 +1,395 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>微电子领域学术会议截止日期</title>
-    <style>
-        :root {
-            --primary-color: #3498db;
-            --secondary-color: #2c3e50;
-            --accent-color: #e74c3c;
-            --success-color: #2ecc71;
-            --warning-color: #f39c12;
-            --light-bg: #f5f7fa;
-            --dark-text: #2c3e50;
-            --light-text: #ecf0f1;
-            --border-radius: 8px;
-            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
-        body {
-            background-color: var(--light-bg);
-            color: var(--dark-text);
-            line-height: 1.6;
-            padding: 20px;
-        }
-        
-        header {
-            text-align: center;
-            margin-bottom: 30px;
-            padding: 20px;
-            background-color: var(--secondary-color);
-            color: var(--light-text);
-            border-radius: var(--border-radius);
-            box-shadow: var(--box-shadow);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        
-        h1 {
-            font-size: 2.2rem;
-            margin-bottom: 10px;
-        }
-        
-        .admin-buttons {
-            margin-top: 15px;
-            display: flex;
-            gap: 10px;
-        }
-        
-        .controls {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-        
-        .search-filter {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-        
-        input, select, button, textarea {
-            padding: 8px 15px;
-            border: 1px solid #ddd;
-            border-radius: var(--border-radius);
-            font-size: 1rem;
-        }
-        
-        button {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        
-        button:hover {
-            background-color: #2980b9;
-        }
-        
-        button.danger {
-            background-color: var(--accent-color);
-        }
-        
-        button.danger:hover {
-            background-color: #c0392b;
-        }
-        
-        button.success {
-            background-color: var(--success-color);
-        }
-        
-        button.success:hover {
-            background-color: #27ae60;
-        }
-        
-        button.warning {
-            background-color: var(--warning-color);
-        }
-        
-        button.warning:hover {
-            background-color: #e67e22;
-        }
-        
-        .view-toggle button {
-            background-color: #95a5a6;
-        }
-        
-        .view-toggle button.active {
-            background-color: var(--primary-color);
-        }
-        
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 30px;
-            background-color: white;
-            border-radius: var(--border-radius);
-            overflow: hidden;
-            box-shadow: var(--box-shadow);
-        }
-        
-        th, td {
-            text-align: left;
-            padding: 12px 15px;
-            border-bottom: 1px solid #ddd;
-        }
-        
-        th {
-            background-color: var(--secondary-color);
-            color: var(--light-text);
-            cursor: pointer;
-        }
-        
-        tr:hover {
-            background-color: #f5f5f5;
-        }
-        
-        .countdown {
-            font-weight: bold;
-        }
-        
-        .urgent {
-            color: var(--accent-color);
-        }
-        
-        .approaching {
-            color: orange;
-        }
-        
-        .comfortable {
-            color: green;
-        }
-        
-        .passed {
-            color: #95a5a6;
-        }
-        
-        .card-view {
-            display: none;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
-        }
-        
-        .conference-card {
-            background-color: white;
-            border-radius: var(--border-radius);
-            overflow: hidden;
-            box-shadow: var(--box-shadow);
-            transition: transform 0.3s;
-        }
-        
-        .conference-card:hover {
-            transform: translateY(-5px);
-        }
-        
-        .card-header {
-            background-color: var(--secondary-color);
-            color: var(--light-text);
-            padding: 15px;
-            position: relative;
-        }
-        
-        .card-header h3 {
-            margin-bottom: 5px;
-        }
-        
-        .card-body {
-            padding: 15px;
-        }
-        
-        .card-body p {
-            margin-bottom: 10px;
-        }
-        
-        .card-footer {
-            background-color: #f5f5f5;
-            padding: 15px;
-            text-align: right;
-            display: flex;
-            justify-content: space-between;
-        }
-        
-        .card-footer a {
-            color: var(--primary-color);
-            text-decoration: none;
-        }
-        
-        .card-footer a:hover {
-            text-decoration: underline;
-        }
-        
-        /* Modal Styles */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            z-index: 1000;
-            overflow: auto;
-            padding: 20px;
-        }
-        
-        .modal-content {
-            background-color: white;
-            margin: 50px auto;
-            padding: 20px;
-            border-radius: var(--border-radius);
-            max-width: 700px;
-            box-shadow: var(--box-shadow);
-            animation: modalFadeIn 0.3s;
-        }
-        
-        @keyframes modalFadeIn {
-            from {opacity: 0; transform: translateY(-50px);}
-            to {opacity: 1; transform: translateY(0);}
-        }
-        
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #ddd;
-        }
-        
-        .close {
-            color: #aaa;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        
-        .close:hover {
-            color: var(--dark-text);
-        }
-        
-        .form-group {
-            margin-bottom: 15px;
-        }
-        
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 600;
-        }
-        
-        .form-group input, .form-group select, .form-group textarea {
-            width: 100%;
-            padding: 10px;
-        }
-        
-        .modal-footer {
-            margin-top: 20px;
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-        }
-        
-        /* Action buttons */
-        .action-buttons {
-            display: flex;
-            gap: 5px;
-        }
-        
-        .action-button {
-            cursor: pointer;
-            padding: 5px 10px;
-            border-radius: var(--border-radius);
-            font-size: 0.9rem;
-        }
-        
-        .notification {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background-color: var(--success-color);
-            color: white;
-            padding: 15px 20px;
-            border-radius: var(--border-radius);
-            box-shadow: var(--box-shadow);
-            z-index: 1001;
-            display: none;
-            animation: notificationFadeIn 0.3s;
-        }
-        
-        @keyframes notificationFadeIn {
-            from {opacity: 0; transform: translateY(30px);}
-            to {opacity: 1; transform: translateY(0);}
-        }
-        
-        .error {
-            background-color: var(--accent-color);
-        }
-        
-        @media (max-width: 768px) {
-            .controls {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            
-            th, td {
-                padding: 8px 10px;
-                font-size: 0.9rem;
-            }
-            
-            th {
-                position: sticky;
-                top: 0;
-            }
-            
-            .responsive-table {
-                overflow-x: auto;
-            }
-            
-            .modal-content {
-                margin: 20px auto;
-                width: 95%;
-            }
-        }
-        
-        footer {
-            text-align: center;
-            margin-top: 30px;
-            padding: 20px;
-            background-color: var(--secondary-color);
-            color: var(--light-text);
-            border-radius: var(--border-radius);
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>微电子学术会议截止日期</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f5f7fb;
+      --card: #ffffff;
+      --text: #1f2a37;
+      --muted: #5b6b7a;
+      --line: #e4eaf2;
+      --accent: #0f62fe;
+      --danger: #d7263d;
+      --ok: #2e7d32;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px 16px 48px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 28px;
+    }
+
+    .sub {
+      margin: 0 0 18px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .table-wrap {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      overflow: auto;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.05);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 980px;
+    }
+
+    th, td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      font-size: 14px;
+      vertical-align: top;
+    }
+
+    th {
+      background: #f0f4fa;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    tbody tr:hover {
+      background: #fafcff;
+    }
+
+    a.conf-link {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    a.conf-link:hover {
+      text-decoration: underline;
+    }
+
+    .deadline-expired {
+      color: var(--danger);
+      font-weight: 600;
+    }
+
+    .deadline-upcoming {
+      color: var(--ok);
+      font-weight: 600;
+    }
+
+    footer {
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+  </style>
 </head>
 <body>
-    <header>
-        <h1>微电子领域学术会议截止日期</h1>
-        <p>帮助您追踪重要微电子学术会议的投稿截止日期</p>
-        <div class="admin-buttons">
-            <button id="adminLoginBtn">管理员登录</button>
-            <button id="suggestChangeBtn">建议修改</button>
-            <button id="exportDataBtn" class="success" style="display: none;">导出数据</button>
-            <input type="file" id="importDataInput" style="display: none;" accept=".json">
-            <button id="importDataBtn" class="warning" style="display: none;">导入数据</button>
-        </div>
-    </header>
-    
-    <div class="controls">
-        <div class="search-filter">
-            <input type="text" id="searchInput" placeholder="搜索会议名称或地点...">
-            <select id="categoryFilter">
-                <option value="">所有类别</option>
-                <option value="集成电路">集成电路</option>
-                <option value="半导体器件">半导体器件</option>
-                <option value="微电子系统">微电子系统</option>
-                <option value="光电子">光电子</option>
-                <option value="电路设计">电路设计</option>
-            </select>
-            <button id="resetFilters">重置筛选</button>
-        </div>
-        
-        <div class="view-toggle">
-            <button id="tableViewBtn" class="active">表格视图</button>
-            <button id="cardViewBtn">卡片视图</button>
-        </div>
-    </div>
-    
-    <div id="tableView" class="responsive-table">
-        <table id="conferencesTable">
-            <thead>
-                <tr>
-                    <th onclick="sortTable(0)">会议名称</th>
-                    <th onclick="sortTable(1)">地点</th>
-                    <th onclick="sortTable(2)">类别</th>
-                    <th onclick="sortTable(3)">投稿截止日期 ▲</th>
-                    <th onclick="sortTable(4)">倒计时</th>
-                    <th onclick="sortTable(5)">会议日期</th>
-                    <th onclick="sortTable(6)">等级/影响力</th>
-                    <th id="actionsHeader" style="display: none;">操作</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- 会议数据将通过 JavaScript 动态填充 -->
-            </tbody>
-        </table>
-    </div>
-    
-    <div id="cardView" class="card-view">
-        <!-- 会议卡片将通过 JavaScript 动态填充 -->
-    </div>
-    
-    <!-- 管理员登录模态框 -->
-    <div id="adminLoginModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>管理员登录</h2>
-                <span class="close">&times;</span>
-            </div>
-            <div class="form-group">
-                <label for="adminUsername">用户名</label>
-                <input type="text" id="adminUsername" placeholder="输入管理员用户名">
-            </div>
-            <div class="form-group">
-                <label for="adminPassword">密码</label>
-                <input type="password" id="adminPassword" placeholder="输入管理员密码">
-            </div>
-            <div class="modal-footer">
-                <button id="loginButton">登录</button>
-            </div>
-        </div>
-    </div>
-    
-    <!-- 会议编辑模态框 -->
-    <div id="editConferenceModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 id="editModalTitle">编辑会议信息</h2>
-                <span class="close">&times;</span>
-            </div>
-            <form id="conferenceForm">
-                <input type="hidden" id="conferenceId">
-                <div class="form-group">
-                    <label for="conferenceName">会议名称*</label>
-                    <input type="text" id="conferenceName" required>
-                </div>
-                <div class="form-group">
-                    <label for="conferenceLocation">地点*</label>
-                    <input type="text" id="conferenceLocation" required>
-                </div>
-                <div class="form-group">
-                    <label for="conferenceCategory">类别*</label>
-                    <select id="conferenceCategory" required>
-                        <option value="集成电路">集成电路</option>
-                        <option value="半导体器件">半导体器件</option>
-                        <option value="微电子系统">微电子系统</option>
-                        <option value="光电子">光电子</option>
-                        <option value="电路设计">电路设计</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="conferenceDeadline">投稿截止日期*</label>
-                    <input type="date" id="conferenceDeadline" required>
-                </div>
-                <div class="form-group">
-                    <label for="conferenceDate">会议日期*</label>
-                    <input type="text" id="conferenceDate" placeholder="格式: YYYY-MM-DD - YYYY-MM-DD" required>
-                </div>
-                <div class="form-group">
-                    <label for="conferenceTier">等级/影响力*</label>
-                    <select id="conferenceTier" required>
-                        <option value="A+">A+</option>
-                        <option value="A">A</option>
-                        <option value="B+">B+</option>
-                        <option value="B">B</option>
-                        <option value="C">C</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="conferenceWebsite">官方网站*</label>
-                    <input type="url" id="conferenceWebsite" placeholder="https://" required>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="danger" id="cancelEditButton">取消</button>
-                    <button type="submit" class="success" id="saveConferenceButton">保存</button>
-                </div>
-            </form>
-        </div>
-    </div>
-    
-    <!-- 建议修改模态框 -->
-    <div id="suggestChangeModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>建议修改会议信息</h2>
-                <span class="close">&times;</span>
-            </div>
-            <form id="suggestionForm">
-                <div class="form-group">
-                    <label for="suggesterName">您的姓名*</label>
-                    <input type="text" id="suggesterName" required>
-                </div>
-                <div class="form-group">
-                    <label for="suggesterEmail">您的邮箱*</label>
-                    <input type="email" id="suggesterEmail" required>
-                </div>
-                <div class="form-group">
-                    <label for="suggestedConference">相关会议名称*</label>
-                    <input type="text" id="suggestedConference" required>
-                </div>
-                <div class="form-group">
-                    <label for="suggestionType">建议类型*</label>
-                    <select id="suggestionType" required>
-                        <option value="添加新会议">添加新会议</option>
-                        <option value="更新会议信息">更新会议信息</option>
-                        <option value="移除过期会议">移除过期会议</option>
-                        <option value="其他建议">其他建议</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="suggestionDetails">详细建议*</label>
-                    <textarea id="suggestionDetails" rows="5" required placeholder="请详细描述您的建议，例如会议的准确名称、日期、地点等信息"></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="suggestionSource">信息来源 (可选)</label>
-                    <input type="text" id="suggestionSource" placeholder="如官方网站链接等">
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="danger" id="cancelSuggestionButton">取消</button>
-                    <button type="submit" class="success" id="submitSuggestionButton">提交建议</button>
-                </div>
-            </form>
-        </div>
-    </div>
-    
-    <!-- 添加新会议按钮 (仅管理员可见) -->
-    <div id="addConferenceButton" style="display: none; margin-bottom: 20px;">
-        <button class="success" onclick="openAddConferenceModal()">添加新会议</button>
-    </div>
-    
-    <!-- 确认删除模态框 -->
-    <div id="confirmDeleteModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>确认删除</h2>
-                <span class="close">&times;</span>
-            </div>
-            <p>您确定要删除 <strong id="conferenceToDelete"></strong> 会议吗？此操作无法撤销。</p>
-            <div class="modal-footer">
-                <button class="danger" id="confirmDeleteButton">确认删除</button>
-                <button id="cancelDeleteButton">取消</button>
-            </div>
-        </div>
-    </div>
-    
-    <!-- 通知提示 -->
-    <div id="notification" class="notification"></div>
-    
+  <main class="container">
+    <h1>微电子领域学术会议截止日期</h1>
+    <p class="sub">默认按投稿截止日期升序排列；倒计时会随当前时间自动更新。</p>
+
+    <section class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>会议名称（简称 - 全称）</th>
+            <th>地点</th>
+            <th>类别</th>
+            <th>投稿截止日期</th>
+            <th>倒计时</th>
+            <th>会议日期</th>
+            <th>等级</th>
+          </tr>
+        </thead>
+        <tbody id="conference-body"></tbody>
+      </table>
+    </section>
+
     <footer>
-        <p>最后更新时间: <span id="lastUpdated"></span></p>
-        <p>数据来源仅供参考，请以官方网站公布信息为准</p>
+      数据可在 <code>index.html</code> 的 <code>conferences</code> 数组中手动维护（当前为 2026 年信息，未公布项标注为 TBD）。
     </footer>
+    <footer>
+     <p>时间与地点仅供参考，以官方最新公布为准（注意区分abstract deadline和submission deadline）。</p>
+    </footer>
+  </main>
 
-    <script>
-        // 默认会议数据
-        const defaultConferences = [
-            {
-                id: 1,
-                name: "ISSCC - IEEE International Solid-State Circuits Conference",
-                location: "San Francisco, USA",
-                category: "集成电路",
-                deadline: "2025-09-10",
-                conferenceDate: "2026-02-15 - 2026-02-19",
-                tier: "A+",
-                website: "https://isscc.org"
-            },
-            {
-                id: 2,
-                name: "IEDM - IEEE International Electron Devices Meeting",
-                location: "San Francisco, USA",
-                category: "半导体器件",
-                deadline: "2025-07-15",
-                conferenceDate: "2025-12-07 - 2025-12-11",
-                tier: "A+",
-                website: "https://ieee-iedm.org"
-            },
-            {
-                id: 3,
-                name: "ASP-DAC - Asia and South Pacific Design Automation Conference",
-                location: "Tokyo, Japan",
-                category: "集成电路",
-                deadline: "2025-07-15",
-                conferenceDate: "2026-01-19 - 2026-01-22",
-                tier: "B",
-                website: "https://aspdac.com"
-            }
-        ];
+  <script>
+    const conferences = [
+      {
+        abbr: "HPCA",
+        full: "IEEE International Symposium on High-Performance Computer Architecture",
+        url: "https://hpca-conf.org/2026/",
+        location: "Sydney, Australia",
+        category: "高性能体系结构",
+        submissionDeadline: "2025-07-15",
+        conferenceDate: "2026-01-31",
+        rank: "CCF A"
+      },
+      {
+        abbr: "ASP-DAC",
+        full: "Asia and South Pacific Design Automation Conference",
+        url: "https://aspdac.com/",
+        location: "Hong Kong, China",
+        category: "EDA / 集成电路设计",
+        submissionDeadline: "2025-07-04",
+        conferenceDate: "2026-01-19",
+        rank: "CCF C"
+      },
+      {
+        abbr: "ISSCC",
+        full: "IEEE International Solid-State Circuits Conference",
+        url: "https://isscc.org/",
+        location: "San Francisco, CA, US",
+        category: "集成电路 / 固态电路",
+        submissionDeadline: "2025-09-02",
+        conferenceDate: "2026-02-15",
+        rank: "领域顶会"
+      },
+      {
+        abbr: "DATE",
+        full: "Design, Automation and Test in Europe",
+        url: "https://www.date-conference.com/",
+        location: "Verona, Italy",
+        category: "EDA / 设计自动化",
+        submissionDeadline: "2025-09-07",
+        conferenceDate: "2026-03-20",
+        rank: "CCF B"
+      },
+      {
+        abbr: "EDTM",
+        full: "IEEE Electron Devices Technology and Manufacturing Conference",
+        url: "https://www.ieee-edtm.org/",
+        location: "Penang, Malaysia",
+        category: "器件 / 制造",
+        submissionDeadline: "2025-11-30",
+        conferenceDate: "2026-03-01 ~ 2026-03-04",
+        rank: "领域会议"
+      },
+      {
+        abbr: "CICC",
+        full: "IEEE Custom Integrated Circuits Conference",
+        url: "https://www.ieee-cicc.org/",
+        location: "Seattle, WA, US",
+        category: "模拟/混合信号 IC",
+        submissionDeadline: "2025-11-17",
+        conferenceDate: "2026-04-19",
+        rank: "领域会议"
+      },
+      {
+        abbr: "IMW",
+        full: "IEEE International Memory Workshop",
+        url: "https://ewh.ieee.org/soc/eds/imw/",
+        location: "Leuven, Belgium",
+        category: "存储器",
+        submissionDeadline: "2026-02-01",
+        conferenceDate: "2026-05-10 ~ 2026-05-13",
+        rank: "领域会议"
+      },
+      {
+        abbr: "ISCAS",
+        full: "IEEE International Symposium on Circuits and Systems",
+        url: "https://2026.ieee-iscas.org/",
+        location: "Shanghai, China",
+        category: "电路与系统",
+        submissionDeadline: "2025-10-26",
+        conferenceDate: "2026-05-24",
+        rank: "CCF C"
+      },
+      {
+        abbr: "DAC",
+        full: "Design Automation Conference",
+        url: "https://dac.com/",
+        location: "Long Beach, CA, US",
+        category: "EDA / 系统设计",
+        submissionDeadline: "2025-11-11",
+        conferenceDate: "2026-06-26",
+        rank: "CCF A"
+      },
+      {
+        abbr: "VLSI",
+        full: "Symposium on VLSI Technology and Circuits",
+        url: "https://vlsisymposium.org/",
+        location: "Honolulu, Hawaii, US",
+        category: "VLSI / 电路与工艺",
+        submissionDeadline: "2026-01-26",
+        conferenceDate: "2026-06-14",
+        rank: "领域顶会"
+      },
+      {
+        abbr: "ISCA",
+        full: "International Symposium on Computer Architecture",
+        url: "https://iscaconf.org/isca2026/",
+        location: "Raleigh, NC, US",
+        category: "计算机体系结构",
+        submissionDeadline: "2025-11-10",
+        conferenceDate: "2026-06-27",
+        rank: "CCF A"
+      },
+      {
+        abbr: "ICTA",
+        full: "IEEE International Conference on Integrated Circuits, Technologies and Applications",
+        url: "http://ieee-icta.org/",
+        location: "Singapore",
+        category: "集成电路技术与应用",
+        submissionDeadline: "2026-07-20",
+        conferenceDate: "2026-10-21 ~ 2026-10-23",
+        rank: "领域会议"
+      },
+      {
+        abbr: "ESSERC",
+        full: "European Solid-State Electronics Research Conference",
+        url: "https://www.esserc2026.org/",
+        location: "Palma de Mallorca, Spain",
+        category: "固态电子 / 电路",
+        submissionDeadline: "2026-04-03",
+        conferenceDate: "2026-09-07 ~ 2026-09-10",
+        rank: "领域会议"
+      },
+      {
+        abbr: "BioCAS",
+        full: "IEEE Biomedical Circuits and Systems Conference",
+        url: "https://ieee-cas.org/event/conference/2026-ieee-biomedical-circuits-and-systems-conference",
+        location: "Incheon, Korea",
+        category: "生物医学电路系统",
+        submissionDeadline: "TBD",
+        conferenceDate: "2026-10-08 ~ 2026-10-10",
+        rank: "领域会议"
+      },
+      {
+        abbr: "MICRO",
+        full: "IEEE/ACM International Symposium on Microarchitecture",
+        url: "https://www.microarch.org/micro59/index.php",
+        location: "Athens, Greece",
+        category: "计算机体系结构",
+        submissionDeadline: "2026-04-07",
+        conferenceDate: "2026-10-31 ~ 2026-11-04",
+        rank: "CCF A"
+      },
+      {
+        abbr: "ICCAD",
+        full: "International Conference on Computer-Aided Design",
+        url: "https://iccad.com/",
+        location: "San Jose, CA, US",
+        category: "EDA / CAD",
+        submissionDeadline: "2026-04-14",
+        conferenceDate: "2026-11-08",
+        rank: "CCF B"
+      },
+      {
+        abbr: "IEDM",
+        full: "IEEE International Electron Devices Meeting",
+        url: "https://ieee-iedm.org/future-conferences",
+        location: "Hilton Union Square, San Francisco, CA, US",
+        category: "器件 / 工艺",
+        submissionDeadline: "TBD",
+        conferenceDate: "2026-12-12 ~ 2026-12-16",
+        rank: "领域顶会"
+      }
+    ];
 
-        // 管理员凭据（使用SHA-256哈希存储密码）
-        const adminCredentials = {
-            username: "admin",
-            // admin123的SHA-256哈希值
-            passwordHash: "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9"
-        };
+    function toDateOnly(dateString) {
+      if (!dateString || dateString === "TBD") {
+        return null;
+      }
+      const date = new Date(dateString + "T23:59:59");
+      if (Number.isNaN(date.getTime())) {
+        return null;
+      }
+      return date;
+    }
 
-        // 从localStorage加载会议数据
-        let storedConferences = localStorage.getItem('conferences');
-        let conferences = storedConferences ? JSON.parse(storedConferences) : defaultConferences;
-        
-        // 管理员状态
-        let isAdmin = false;
-        let selectedConferenceId = null;
+    function formatDate(dateString) {
+      if (!dateString || dateString === "TBD") {
+        return "TBD";
+      }
+      const [y, m, d] = dateString.split("-");
+      if (!y || !m || !d) {
+        return "TBD";
+      }
+      return y + "-" + m + "-" + d;
+    }
 
-        // 保存会议数据到localStorage
-        function saveConferences() {
-            localStorage.setItem('conferences', JSON.stringify(conferences));
+    function getCountdown(deadlineString) {
+      if (!deadlineString || deadlineString === "TBD") {
+        return { text: "待发布", expired: false };
+      }
+
+      const now = new Date();
+      const deadline = toDateOnly(deadlineString);
+      if (!deadline) {
+        return { text: "待发布", expired: false };
+      }
+      const diffMs = deadline - now;
+      const dayMs = 24 * 60 * 60 * 1000;
+
+      if (diffMs < 0) {
+        return { text: "已截止", expired: true };
+      }
+
+      const days = Math.floor(diffMs / dayMs);
+      const hours = Math.floor((diffMs % dayMs) / (60 * 60 * 1000));
+      return { text: days + " 天 " + hours + " 小时", expired: false };
+    }
+
+    function renderTable() {
+      const tbody = document.getElementById("conference-body");
+      const sorted = conferences.slice().sort((a, b) => {
+        const aDate = toDateOnly(a.submissionDeadline);
+        const bDate = toDateOnly(b.submissionDeadline);
+        if (aDate && bDate) {
+          return aDate - bDate;
         }
-
-        // 导出会议数据为JSON文件
-        function exportData() {
-            const dataStr = JSON.stringify(conferences, null, 2);
-            const blob = new Blob([dataStr], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'conferences.json';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
+        if (aDate && !bDate) {
+          return -1;
         }
-
-        // 用于生成SHA-256哈希的函数
-        async function sha256(message) {
-            const msgBuffer = new TextEncoder().encode(message);
-            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-            const hashArray = Array.from(new Uint8Array(hashBuffer));
-            const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-            return hashHex;
+        if (!aDate && bDate) {
+          return 1;
         }
+        return a.abbr.localeCompare(b.abbr);
+      });
 
-        // DOM元素
-        const tableView = document.getElementById('tableView');
-        const cardView = document.getElementById('cardView');
-        const tableViewBtn = document.getElementById('tableViewBtn');
-        const cardViewBtn = document.getElementById('cardViewBtn');
-        const adminLoginBtn = document.getElementById('adminLoginBtn');
-        const adminLoginModal = document.getElementById('adminLoginModal');
-        const editConferenceModal = document.getElementById('editConferenceModal');
-        const suggestChangeBtn = document.getElementById('suggestChangeBtn');
-        const suggestChangeModal = document.getElementById('suggestChangeModal');
-        const addConferenceButton = document.getElementById('addConferenceButton');
-        const confirmDeleteModal = document.getElementById('confirmDeleteModal');
-        const actionsHeader = document.getElementById('actionsHeader');
-        const notificationElement = document.getElementById('notification');
+      tbody.innerHTML = "";
 
-        // 初始化页面
-        document.addEventListener('DOMContentLoaded', function() {
-            // 更新最后更新时间
-            const now = new Date();
-            document.getElementById('lastUpdated').textContent = now.toLocaleString();
-            
-            // 初始化表格和卡片视图
-            sortConferencesByDeadline();
-            updateTableView();
-            updateCardView();
-            
-            // 检查本地存储中的管理员状态
-            checkAdminStatus();
-            
-            // 注册事件监听器
-            registerEventListeners();
-        });
+      sorted.forEach((conf) => {
+        const countdown = getCountdown(conf.submissionDeadline);
+        const tr = document.createElement("tr");
+        tr.innerHTML =
+          '<td><a class="conf-link" href="' + conf.url + '" target="_blank" rel="noopener noreferrer">' +
+          conf.abbr + " - " + conf.full + "</a></td>" +
+          "<td>" + conf.location + "</td>" +
+          "<td>" + conf.category + "</td>" +
+          "<td>" + formatDate(conf.submissionDeadline) + "</td>" +
+          '<td class="' + (countdown.expired ? "deadline-expired" : "deadline-upcoming") + '">' + countdown.text + "</td>" +
+          "<td>" + conf.conferenceDate + "</td>" +
+          "<td>" + conf.rank + "</td>";
+        tbody.appendChild(tr);
+      });
+    }
 
-        // 检查管理员状态
-        function checkAdminStatus() {
-            const storedAdminStatus = localStorage.getItem('isAdmin');
-            if (storedAdminStatus === 'true') {
-                isAdmin = true;
-                adminLoginBtn.textContent = '退出管理员';
-                addConferenceButton.style.display = 'block';
-                exportDataBtn.style.display = 'block';
-                importDataBtn.style.display = 'block';
-                actionsHeader.style.display = '';
-                updateTableView();
-                updateCardView();
-            }
-        }
-
-        // 导入数据
-        async function importData(file) {
-            try {
-                const text = await file.text();
-                const importedData = JSON.parse(text);
-                if (Array.isArray(importedData)) {
-                    conferences = importedData;
-                    saveConferences();
-                    updateUI();
-                    showNotification('数据导入成功！', false);
-                } else {
-                    throw new Error('无效的数据格式');
-                }
-            } catch (error) {
-                showNotification('导入失败：' + error.message, true);
-            }
-        }
-
-        // 注册事件监听器
-        function registerEventListeners() {
-            // 视图切换
-            tableViewBtn.addEventListener('click', function() {
-                tableView.style.display = 'block';
-                cardView.style.display = 'none';
-                this.classList.add('active');
-                cardViewBtn.classList.remove('active');
-            });
-            
-            cardViewBtn.addEventListener('click', function() {
-                tableView.style.display = 'none';
-                cardView.style.display = 'grid';
-                this.classList.add('active');
-                tableViewBtn.classList.remove('active');
-            });
-            
-            // 搜索和筛选
-            document.getElementById('searchInput').addEventListener('input', updateViews);
-            document.getElementById('categoryFilter').addEventListener('change', updateViews);
-            document.getElementById('resetFilters').addEventListener('click', resetFilters);
-            
-            // 管理员登录相关
-            adminLoginBtn.addEventListener('click', toggleAdminLogin);
-            document.getElementById('loginButton').addEventListener('click', handleAdminLogin);
-            
-            // 会议表单提交
-            document.getElementById('conferenceForm').addEventListener('submit', function(e) {
-                e.preventDefault();
-                handleSaveConference();
-            });
-
-            // 数据导出导入
-            document.getElementById('exportDataBtn').addEventListener('click', exportData);
-            document.getElementById('importDataBtn').addEventListener('click', function() {
-                document.getElementById('importDataInput').click();
-            });
-            document.getElementById('importDataInput').addEventListener('change', function(e) {
-                if (e.target.files.length > 0) {
-                    importData(e.target.files[0]);
-                    e.target.value = '';
-                }
-            });
-            
-            // 建议提交
-            document.getElementById('suggestionForm').addEventListener('submit', function(e) {
-                e.preventDefault();
-                handleSuggestion();
-            });
-            
-            // 打开建议修改模态框
-            suggestChangeBtn.addEventListener('click', function() {
-                openModal(suggestChangeModal);
-            });
-            
-            // 关闭按钮
-            document.querySelectorAll('.close').forEach(function(closeBtn) {
-                closeBtn.addEventListener('click', function() {
-                    closeModal(this.closest('.modal'));
-                });
-            });
-            
-            // 取消按钮
-            document.getElementById('cancelEditButton').addEventListener('click', function() {
-                closeModal(editConferenceModal);
-            });
-            
-            document.getElementById('cancelSuggestionButton').addEventListener('click', function() {
-                closeModal(suggestChangeModal);
-            });
-            
-            document.getElementById('cancelDeleteButton').addEventListener('click', function() {
-                closeModal(confirmDeleteModal);
-            });
-            
-            // 确认删除
-            document.getElementById('confirmDeleteButton').addEventListener('click', function() {
-                deleteConference(selectedConferenceId);
-                closeModal(confirmDeleteModal);
-            });
-        }
-
-        // 切换管理员登录状态
-        function toggleAdminLogin() {
-            if (isAdmin) {
-                // 退出管理员
-                isAdmin = false;
-                localStorage.removeItem('isAdmin');
-                adminLoginBtn.textContent = '管理员登录';
-                addConferenceButton.style.display = 'none';
-                actionsHeader.style.display = 'none';
-                updateTableView();
-                updateCardView();
-                showNotification('您已退出管理员模式');
-            } else {
-                // 打开登录模态框
-                openModal(adminLoginModal);
-            }
-        }
-
-        // 处理管理员登录
-        function handleAdminLogin() {
-            const username = document.getElementById('adminUsername').value;
-            const password = document.getElementById('adminPassword').value;
-            
-            if (username === adminCredentials.username && password === adminCredentials.password) {
-                isAdmin = true;
-                localStorage.setItem('isAdmin', 'true');
-                adminLoginBtn.textContent = '退出管理员';
-                addConferenceButton.style.display = 'block';
-                actionsHeader.style.display = '';
-                updateTableView();
-                updateCardView();
-                closeModal(adminLoginModal);
-                showNotification('管理员登录成功');
-                
-                // 清空登录表单
-                document.getElementById('adminUsername').value = '';
-                document.getElementById('adminPassword').value = '';
-            } else {
-                showNotification('用户名或密码错误', true);
-            }
-        }
-
-        // 按截止日期对会议排序
-        function sortConferencesByDeadline() {
-            conferences.sort((a, b) => {
-                return new Date(a.deadline) - new Date(b.deadline);
-            });
-        }
-
-        // 更新表格视图
-        function updateTableView() {
-            const tableBody = document.querySelector('#conferencesTable tbody');
-            tableBody.innerHTML = '';
-            
-            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-            const selectedCategory = document.getElementById('categoryFilter').value;
-            
-            // 过滤会议数据
-            const filteredConferences = conferences.filter(conference => {
-                const matchesSearch = conference.name.toLowerCase().includes(searchTerm) ||
-                                     conference.location.toLowerCase().includes(searchTerm);
-                const matchesCategory = !selectedCategory || conference.category === selectedCategory;
-                return matchesSearch && matchesCategory;
-            });
-            
-            // 更新表格内容
-            filteredConferences.forEach(conference => {
-                const row = document.createElement('tr');
-                const deadline = new Date(conference.deadline);
-                const today = new Date();
-                const daysUntilDeadline = Math.ceil((deadline - today) / (1000 * 60 * 60 * 24));
-                
-                // 格式化日期显示
-                const formattedDeadline = deadline.toLocaleDateString('zh-CN');
-                
-                row.innerHTML = `
-                    <td><a href="${conference.website}" target="_blank">${conference.name}</a></td>
-                    <td>${conference.location}</td>
-                    <td>${conference.category}</td>
-                    <td>${formattedDeadline}</td>
-                    <td>${daysUntilDeadline > 0 ? daysUntilDeadline + ' 天' : '已截止'}</td>
-                    <td>${conference.conferenceDate}</td>
-                    <td>${conference.tier}</td>
-                    ${isAdmin ? `
-                        <td>
-                            <button onclick="editConference(${conference.id})" class="edit-btn">编辑</button>
-                            <button onclick="showDeleteConfirmation(${conference.id})" class="delete-btn">删除</button>
-                        </td>
-                    ` : ''}
-                `;
-                
-                // 根据截止日期添加状态样式
-                if (daysUntilDeadline < 0) {
-                    row.classList.add('passed');
-                } else if (daysUntilDeadline <= 7) {
-                    row.classList.add('urgent');
-                } else if (daysUntilDeadline <= 30) {
-                    row.classList.add('approaching');
-                } else {
-                    row.classList.add('comfortable');
-                }
-                
-                tableBody.appendChild(row);
-            });
-        }
+    renderTable();
+    setInterval(renderTable, 60 * 1000);
+  </script>
+</body>
+</html>
