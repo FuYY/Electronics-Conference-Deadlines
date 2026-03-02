@@ -40,6 +40,44 @@
       font-size: 28px;
     }
 
+    .header-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .top-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .icon-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid var(--line);
+      background: var(--card);
+      color: var(--text);
+      border-radius: 10px;
+      padding: 8px 12px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    }
+
+    .icon-btn:hover {
+      border-color: #b9c7da;
+      background: #f9fbff;
+    }
+
+    .btn-icon {
+      font-size: 14px;
+      line-height: 1;
+    }
+
     .sub {
       margin: 0 0 18px;
       color: var(--muted);
@@ -113,11 +151,90 @@
       color: var(--muted);
       font-size: 12px;
     }
+
+    .overlay[hidden] {
+      display: none;
+    }
+
+    .overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 999;
+      background: rgba(15, 23, 42, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .panel-card {
+      width: min(520px, 100%);
+      background: var(--card);
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      padding: 18px;
+    }
+
+    .panel-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .panel-title {
+      margin: 0;
+      font-size: 18px;
+    }
+
+    .close-btn {
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 8px;
+      padding: 5px 10px;
+      cursor: pointer;
+    }
+
+    .panel-section[hidden] {
+      display: none;
+    }
+
+    .panel-link {
+      display: inline-block;
+      margin-top: 8px;
+      font-weight: 600;
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .panel-link:hover {
+      text-decoration: underline;
+    }
+
+    .donate-img {
+      width: 100%;
+      max-width: 360px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      display: block;
+      margin-top: 8px;
+    }
   </style>
 </head>
 <body>
   <main class="container">
-    <h1>微电子领域学术会议截止日期</h1>
+    <div class="header-row">
+      <h1>微电子领域学术会议截止日期</h1>
+      <div class="top-actions">
+        <button id="show-github" class="icon-btn" type="button" aria-label="查看 GitHub 项目">
+          <span class="btn-icon">🔗</span><span>GitHub</span>
+        </button>
+        <button id="show-donate" class="icon-btn" type="button" aria-label="查看赞助收款码">
+          <span class="btn-icon">💝</span><span>赞助</span>
+        </button>
+      </div>
+    </div>
     <p class="sub">默认按投稿截止日期升序排列；倒计时会随当前时间自动更新。</p>
 
     <section class="table-wrap">
@@ -144,6 +261,27 @@
      <p>时间与地点仅供参考，以官方最新公布为准（注意区分abstract deadline和submission deadline）。</p>
     </footer>
   </main>
+
+  <div id="quick-panel" class="overlay" hidden>
+    <div class="panel-card" role="dialog" aria-modal="true" aria-labelledby="panel-title">
+      <div class="panel-head">
+        <h2 id="panel-title" class="panel-title">信息面板</h2>
+        <button id="close-panel" class="close-btn" type="button">关闭</button>
+      </div>
+
+      <section id="panel-github" class="panel-section" hidden>
+        <p>项目地址：</p>
+        <a class="panel-link" href="https://github.com/FuYY/Electronics-Conference-Deadlines" target="_blank" rel="noopener noreferrer">
+          https://github.com/FuYY/Electronics-Conference-Deadlines
+        </a>
+      </section>
+
+      <section id="panel-donate" class="panel-section" hidden>
+        <p>感谢支持，收款码如下：</p>
+        <img class="donate-img" src="26d4f0b365aa16c6a2fe47ebf19762f9.jpg" alt="捐赠收款码" />
+      </section>
+    </div>
+  </div>
 
   <script>
     const conferences = [
@@ -418,6 +556,38 @@
         tbody.appendChild(tr);
       });
     }
+
+    const quickPanel = document.getElementById("quick-panel");
+    const panelTitle = document.getElementById("panel-title");
+    const panelGithub = document.getElementById("panel-github");
+    const panelDonate = document.getElementById("panel-donate");
+
+    function openPanel(type) {
+      panelGithub.hidden = type !== "github";
+      panelDonate.hidden = type !== "donate";
+      panelTitle.textContent = type === "github" ? "GitHub 项目" : "赞助收款码";
+      quickPanel.hidden = false;
+    }
+
+    function closePanel() {
+      quickPanel.hidden = true;
+    }
+
+    document.getElementById("show-github").addEventListener("click", function() {
+      openPanel("github");
+    });
+
+    document.getElementById("show-donate").addEventListener("click", function() {
+      openPanel("donate");
+    });
+
+    document.getElementById("close-panel").addEventListener("click", closePanel);
+
+    quickPanel.addEventListener("click", function(event) {
+      if (event.target === quickPanel) {
+        closePanel();
+      }
+    });
 
     renderTable();
     setInterval(renderTable, 60 * 1000);
